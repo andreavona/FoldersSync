@@ -22,10 +22,6 @@ if (replica[-1]!='/'):
     replica = replica + '/'
 
 
-# we get all the files and directories of the folders
-# srcPaths = os.listdir(src)
-# replicaPaths = os.listdir(replica)
-
 # we split the files and the directories of the two folders
 # because we will need the hash of the files later, the first return
 # will be a dict {file1-title: hash1, ..., fileN-title:hashN}
@@ -45,6 +41,7 @@ def getFilesAndFolders(folder):
             dir.append(p)
     return files, dir
 
+
 srcFiles, srcDirs = getFilesAndFolders(src)
 replicaFiles, replicaDirs = getFilesAndFolders(replica)
 
@@ -62,7 +59,6 @@ def copyFile(nameReplicaFile, nameSrcFile):
 # 1. the hashes match meaning that the files are already present
 # 2. the hash don't match meaning we have to create a new file
 def syncFiles(srcFiles, replicaFiles):
-    #sameFiles = True
     for srcFileHash in srcFiles:
         replicaFilePath = replica + srcFiles[srcFileHash]
         srcFilePath = src + srcFiles[srcFileHash]
@@ -80,9 +76,7 @@ def syncFiles(srcFiles, replicaFiles):
     for replicaFileHash in replicaFiles:
         replicaFilePath = replica + replicaFiles[replicaFileHash]
         if (replicaFileHash not in srcFiles):
-            #sameFiles = False
             os.remove(replicaFilePath)
-    #return sameFiles
 
 syncFiles(srcFiles, replicaFiles)
 
