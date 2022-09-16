@@ -2,6 +2,7 @@ from genericpath import isfile
 import sys
 import os
 import hashlib
+from turtle import title
 
 # parameters:
 # folder source [path]
@@ -38,8 +39,8 @@ def getFilesAndFolders(folder):
             f = open(fname)
             content =  f.read()
             f.close()
-            h = hash(content)
-            files[p] = h
+            h = hash(content) + hash(p)
+            files[h] = p
         else:
             dir.append(p)
     return files, dir
@@ -57,36 +58,18 @@ def copyFile(nameReplicaFile, nameSrcFile):
     newReplicaFile.close()
     srcFile.close()
 
-# in the case of files we have four subcases:
-# 1. the title and hash of files match: no action needed
-# 2. the title does not match but the hash does: rename the file (in the replica)
-# 3. the title match but the hash doesn't: change the content of the file
-# 4. they both don't match: create a new file
+# For the files creation, we have two subcases:
+# 1. the hashes match meaning that the files are already present
+# 2. the hash don't match meaning we have to create a new file
 def syncFiles(srcFiles, replicaFiles):
     #sameFiles = True
-    for srcFileTitle in srcFiles:
-        replicaFilePath = replica + srcFileTitle
-        srcFilePath = src + srcFileTitle
+    for srcFileHash in srcFiles:
+        replicaFilePath = replica + srcFiles[srcFileHash]
+        srcFilePath = src + srcFiles[srcFileHash]
 
-        # not title
-        if (srcFileTitle not in replicaFiles):
-            #sameFiles = False
-            notTitleAndHash = False
-            for replicaFileTitle in replicaFiles:
-                # not title, hash -> case 2
-                if (srcFiles[srcFileTitle]==replicaFiles[replicaFileTitle]):
-                    os.rename(replicaFileTitle, srcFileTitle)
-                    notTitleAndHash = True
-                    break
-
-            # not title, not hash -> case 4
-            if not notTitleAndHash:
-                copyFile(replicaFilePath, srcFilePath)
-        else:
-            # title, not hash -> case 3
-            if(srcFiles[srcFileTitle]!=replicaFiles[srcFileTitle]):
-                #sameFiles = False
-                copyFile(replicaFilePath, srcFilePath)
+        # not hash
+        if (srcFileHash not in replicaFiles):
+            copyFile(replicaFilePath, srcFilePath)
 
     # we can now proceed to remove the files not
     # present in the src folder
@@ -94,9 +77,9 @@ def syncFiles(srcFiles, replicaFiles):
     replicaFiles = getFilesAndFolders(replica)[0]
 
     # removes files
-    for replicaFileTitle in replicaFiles:
-        replicaFilePath = replica + replicaFileTitle
-        if (replicaFileTitle not in srcFiles):
+    for replicaFileHash in replicaFiles:
+        replicaFilePath = replica + replicaFiles[replicaFileHash]
+        if (replicaFileHash not in srcFiles):
             #sameFiles = False
             os.remove(replicaFilePath)
     #return sameFiles
