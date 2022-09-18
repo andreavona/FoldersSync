@@ -3,23 +3,6 @@ import os
 from shutil import copytree, rmtree
 import time
 
-# parameters:
-# folder source [path]
-# folder replica [path]
-# synchronization interval [ns]
-# log file [path]
-
-src = sys.argv[1]
-replica = sys.argv[2]
-interval = sys.argv[3]
-logFile = sys.argv[4]
-
-# adding '/' at the end of the paths, just in case
-if (src[-1]!='/'):
-    src = src + '/'
-if (replica[-1]!='/'):
-    replica = replica + '/'
-
 
 # hash of name and content of a file
 def getFileHash(folder, fileName):
@@ -184,11 +167,29 @@ def syncFolders(srcDirs, replicaDirs, src, replica):
             printFolderContent(replicaDirPath, False)
             rmtree(replicaDirPath)
 
+
+# parameters:
+# folder source [path]
+# folder replica [path]
+# synchronization interval [ns]
+# log file [path]
+src = sys.argv[1]
+replica = sys.argv[2]
+interval = sys.argv[3]
+logFile = sys.argv[4]
+
+# adding '/' at the end of the paths, just in case
+if (src[-1]!='/'):
+    src = src + '/'
+if (replica[-1]!='/'):
+    replica = replica + '/'
+
 # initializes log file
 lf = open(logFile, 'w')
 lf.write('')
 lf.close()
 interval = float(interval)
+
 while True:
     srcFiles, srcDirs = getFilesAndFolders(src)
     replicaFiles, replicaDirs = getFilesAndFolders(replica)
