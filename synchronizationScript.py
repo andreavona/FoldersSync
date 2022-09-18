@@ -170,7 +170,7 @@ def syncFolders(srcDirs, replicaDirs, src, replica):
             newReplicaFolder = copytree(srcDirPath, replicaDirPath)
             printFolderContent(newReplicaFolder, True)
 
-    # remvose all the directories not present in the src folder but 
+    # removes all the directories not present in the src folder but 
     # in the replica folders
     for replicaDir in replicaDirs:
         if replicaDir not in srcDirs:
