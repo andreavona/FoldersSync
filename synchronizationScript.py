@@ -2,6 +2,7 @@ from genericpath import isfile
 import sys
 import os
 from shutil import copytree, rmtree
+import time
 
 # parameters:
 # folder source [path]
@@ -51,6 +52,7 @@ def getFilesAndFolders(folder):
 
 
 # auxiliary function to copy a file
+# params: full paths
 def copyFile(nameReplicaFile, nameSrcFile):
     newReplicaFile = open(nameReplicaFile, 'w')
     srcFile = open(nameSrcFile)
@@ -74,6 +76,18 @@ def syncFiles(srcFiles, replicaFiles, src, replica):
 
         # not hash
         if (srcFileHash not in replicaFiles):
+            if srcFiles[srcFileHash] in replicaFiles.values():
+                msg = "File update: " + replicaFilePath
+                print(msg)
+                lf = open(logFile, "a")
+                lf.write(msg)
+                lf.close()
+            else:
+                msg = "File creation: " + replicaFilePath
+                print(msg)
+                lf = open(logFile, "a")
+                lf.write(msg + "\n")
+                lf.close()
             copyFile(replicaFilePath, srcFilePath)
 
     # we can now proceed to remove the files not
@@ -85,7 +99,39 @@ def syncFiles(srcFiles, replicaFiles, src, replica):
     for replicaFileHash in replicaFiles:
         replicaFilePath = replica + replicaFiles[replicaFileHash]
         if (replicaFileHash not in srcFiles):
+            msg = "File removal: " + replicaFilePath
+            print(msg)
+            lf = open(logFile, "a")
+            lf.write(msg + "\n")
+            lf.close()
             os.remove(replicaFilePath)
+
+
+# param 'folder' is the full path
+def printFolderContent(folder, creation):
+    folderFiles, folderDirs = getFilesAndFolders(folder)
+
+    if creation:
+        msgFile = "File creation: " + folderFilePath
+        msgDir = "Folder creation: " + folderDirPath
+    else:
+        msgFile = "File removal: " + folderFilePath
+        msgDir = "Folder removal: " + folderDirPath
+    
+    for ff in folderFiles.values():
+        folderFilePath = folder + ff
+        print(msgFile)
+        lf = open(logFile, "a")
+        lf.write(msgFile + "\n")
+        lf.close()
+    for fd in folderDirs:
+        folderDirPath = folder + fd + "/"
+        print(msgDir)
+        lf = open(logFile, "a")
+        lf.write(msgDir + "\n")
+        lf.close()
+        printFolderContent(folderDirPath)
+
 
 
 # first part, folders' creation:
@@ -116,21 +162,32 @@ def syncFolders(srcDirs, replicaDirs, src, replica):
 
         # srcDir is not in the replicaDirs -> create the dir inside of it
         except:
-            print(srcDirPath)
-            print(replica)
             replicaDirPath = replica + srcDir + '/'
-            copytree(srcDirPath, replicaDirPath)
+            msg = "Folder creation: " + replicaDirPath
+            print(msg)
+            lf = open(logFile, "a")
+            lf.write(msg + "\n")
+            lf.close()
+            newReplicaFolder = copytree(srcDirPath, replicaDirPath)
+            printFolderContent(newReplicaFolder, True)
 
     # remvose all the directories not present in the src folder but 
     # in the replica folders
     for replicaDir in replicaDirs:
         if replicaDir not in srcDirs:
             replicaDirPath = replica + replicaDir + '/'
+            print("Folder removal: " + replicaDirPath)
+            printFolderContent(newReplicaFolder, False)
             rmtree(replicaDirPath)
 
-
-
-srcFiles, srcDirs = getFilesAndFolders(src)
-replicaFiles, replicaDirs = getFilesAndFolders(replica)
-syncFiles(srcFiles, replicaFiles, src, replica)
-syncFolders(srcDirs, replicaDirs, src, replica)
+# initializes log file
+lf = open(logFile, 'w')
+lf.write('')
+lf.close()
+interval = float(interval)
+while True:
+    srcFiles, srcDirs = getFilesAndFolders(src)
+    replicaFiles, replicaDirs = getFilesAndFolders(replica)
+    syncFiles(srcFiles, replicaFiles, src, replica)
+    syncFolders(srcDirs, replicaDirs, src, replica)
+    time.sleep(interval)
