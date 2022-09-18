@@ -1,4 +1,4 @@
-# Track
+# FoldersSinc
 Script that synchronizes two folders: source and replica.
 
 ## Script organization
