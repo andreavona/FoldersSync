@@ -109,22 +109,23 @@ def syncFiles(srcFiles, replicaFiles, src, replica):
 # param 'folder' is the full path
 def printFolderContent(folder, creation):
     folderFiles, folderDirs = getFilesAndFolders(folder)
-
-    if creation:
-        msgFile = "File creation: " + folderFilePath
-        msgDir = "Folder creation: " + folderDirPath
-    else:
-        msgFile = "File removal: " + folderFilePath
-        msgDir = "Folder removal: " + folderDirPath
     
     for ff in folderFiles.values():
         folderFilePath = folder + ff
+        if creation:
+            msgFile = "File creation: " + folderFilePath
+        else:
+            msgFile = "File removal: " + folderFilePath
         print(msgFile)
         lf = open(logFile, "a")
         lf.write(msgFile + "\n")
         lf.close()
     for fd in folderDirs:
         folderDirPath = folder + fd + "/"
+        if creation:
+            msgDir = "Folder creation: " + folderDirPath
+        else:
+            msgDir = "Folder removal: " + folderDirPath
         print(msgDir)
         lf = open(logFile, "a")
         lf.write(msgDir + "\n")
@@ -166,9 +167,9 @@ def syncFolders(srcDirs, replicaDirs, src, replica):
             print(msg)
             lf = open(logFile, "a")
             lf.write(msg + "\n")
-            lf.close()
-            newReplicaFolder = copytree(srcDirPath, replicaDirPath)
-            printFolderContent(newReplicaFolder, True)
+            lf.close()       
+            copytree(srcDirPath, replicaDirPath)
+            printFolderContent(replicaDirPath, True)
 
     # removes all the directories not present in the src folder but 
     # in the replica folders
@@ -176,7 +177,7 @@ def syncFolders(srcDirs, replicaDirs, src, replica):
         if replicaDir not in srcDirs:
             replicaDirPath = replica + replicaDir + '/'
             print("Folder removal: " + replicaDirPath)
-            printFolderContent(newReplicaFolder, False)
+            printFolderContent(replicaDirPath, False)
             rmtree(replicaDirPath)
 
 # initializes log file
