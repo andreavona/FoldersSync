@@ -176,7 +176,11 @@ def syncFolders(srcDirs, replicaDirs, src, replica):
     for replicaDir in replicaDirs:
         if replicaDir not in srcDirs:
             replicaDirPath = replica + replicaDir + '/'
-            print("Folder removal: " + replicaDirPath)
+            msg = "Folder removal: " + replicaDirPath
+            print(msg)
+            lf = open(logFile, "a")
+            lf.write(msg + "\n")
+            lf.close()   
             printFolderContent(replicaDirPath, False)
             rmtree(replicaDirPath)
 
