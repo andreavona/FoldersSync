@@ -130,7 +130,7 @@ def printFolderContent(folder, creation):
         lf = open(logFile, "a")
         lf.write(msgDir + "\n")
         lf.close()
-        printFolderContent(folderDirPath)
+        printFolderContent(folderDirPath, creation)
 
 
 
