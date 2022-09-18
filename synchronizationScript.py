@@ -1,4 +1,3 @@
-from genericpath import isfile
 import sys
 import os
 from shutil import copytree, rmtree
