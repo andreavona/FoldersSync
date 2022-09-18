@@ -87,26 +87,6 @@ def syncFiles(srcFiles, replicaFiles, src, replica):
         if (replicaFileHash not in srcFiles):
             os.remove(replicaFilePath)
 
-# computes a folder hash
-# takes as parameter the full folder path
-def getFolderHash(folder):
-    if (folder[-1]!='/'):
-        folder = folder + '/'
-    paths = os.listdir(folder)
-    #print(paths)
-    if (len(paths)==0):
-        nameDir = folder.split('/')[-2]
-        return hash(nameDir)
-    else:
-        folderFiles, folderDirs = getFilesAndFolders(folder)
-        hashesFilesSum = 0
-        hashesDirsSum = 0
-        for h in folderFiles:
-            hashesFilesSum = hashesFilesSum + h
-        for d in folderDirs:
-            folderPath = folder + d
-            hashesDirsSum = hashesDirsSum + getFolderHash(folderPath)
-        return hashesFilesSum + hashesDirsSum
 
 # first part, folders' creation:
 # if the src folder directory name is present between the replicas
