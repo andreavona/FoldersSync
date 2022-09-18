@@ -39,4 +39,4 @@ The second part of the function concerns the directories' removal. In particular
 The last part of the script consists of a cycle that is paced by the interval implemented through the python built-in function sleep().
 <br />
 <br />
-Please notice that the following script due to the different syntax for file/directories path only supports Mac Os and Linux systems.
+Please notice that the following script due to the different syntax for file/directories paths only supports Mac Os and Linux systems.
